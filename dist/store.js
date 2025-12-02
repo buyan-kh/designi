@@ -5,10 +5,10 @@ import { designProfileSchema } from './designProfileSchema.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 // When running from dist/, go up one level to project root
-const DATA_FILE = resolve(__dirname, '../design-profile.json');
-export async function loadDesignProfile() {
+export const DEFAULT_PROFILE_PATH = resolve(__dirname, '../design-profile.json');
+export async function loadDesignProfile(filePath = DEFAULT_PROFILE_PATH) {
     try {
-        const data = await fs.readFile(DATA_FILE, 'utf8');
+        const data = await fs.readFile(filePath, 'utf8');
         const profile = JSON.parse(data);
         return designProfileSchema.parse(profile);
     }
@@ -16,17 +16,17 @@ export async function loadDesignProfile() {
         if (error.code === 'ENOENT') {
             console.log('Design profile file not found, creating a new one.');
             const newProfile = {};
-            await saveDesignProfile(newProfile);
+            await saveDesignProfile(newProfile, filePath);
             return newProfile;
         }
         console.error('Error loading design profile:', error);
         return {}; // Return empty profile on error
     }
 }
-export async function saveDesignProfile(profile) {
+export async function saveDesignProfile(profile, filePath = DEFAULT_PROFILE_PATH) {
     try {
         const validatedProfile = designProfileSchema.parse(profile);
-        await fs.writeFile(DATA_FILE, JSON.stringify(validatedProfile, null, 2), 'utf8');
+        await fs.writeFile(filePath, JSON.stringify(validatedProfile, null, 2), 'utf8');
     }
     catch (error) {
         console.error('Error saving design profile:', error);

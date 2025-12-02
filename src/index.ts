@@ -42,7 +42,7 @@ mcpServer.registerTool(
       ...input,
       colorPalette: input.colorPalette ? { ...currentProfile.colorPalette, ...input.colorPalette } : currentProfile.colorPalette,
       typography: input.typography ? { ...currentProfile.typography, ...input.typography } : currentProfile.typography,
-      keywords: input.keywords ? Array.from(new Set([...(currentProfile.keywords || []), ...input.keywords])) : currentProfile.keywords,
+      keywords: input.keywords ? Array.from(new Set(input.keywords)) : currentProfile.keywords,
     };
 
     await saveDesignProfile(updatedProfile);
