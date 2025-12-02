@@ -19,7 +19,6 @@ mcpServer.registerTool(
     title: 'Get Design Identity',
     description: 'Retrieves the user\'s current design identity profile, including color palette, typography, and general tone.',
     inputSchema: z.object({}),
-    outputSchema: designProfileSchema,
   },
   async () => {
     const profile = await loadDesignProfile();
@@ -35,7 +34,6 @@ mcpServer.registerTool(
     title: 'Update Design Identity',
     description: 'Updates specific aspects of the user\'s design identity profile. Only provided fields will be updated.',
     inputSchema: designProfileUpdateSchema,
-    outputSchema: designProfileSchema,
   },
   async (input: z.infer<typeof designProfileUpdateSchema>) => {
     let currentProfile = await loadDesignProfile();
@@ -57,6 +55,34 @@ mcpServer.registerTool(
 const app = express();
 app.use(express.json());
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
+// CORS middleware
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'design_identity_server',
+    version: '1.0.0',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// MCP endpoint
 app.post('/mcp', async (req, res) => {
   try {
     const transport = new StreamableHTTPServerTransport({
@@ -73,16 +99,25 @@ app.post('/mcp', async (req, res) => {
   } catch (error) {
     console.error('Error handling MCP request:', error);
     if (!res.headersSent) {
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
       res.status(500).json({
         jsonrpc: '2.0',
         error: {
           code: -32603,
-          message: 'Internal server error'
+          message: errorMessage
         },
         id: null
       });
     }
   }
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Not found',
+    path: req.path
+  });
 });
 
 const port = parseInt(process.env.PORT || '3000');

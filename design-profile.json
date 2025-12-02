@@ -1,0 +1,24 @@
+{
+  "colorPalette": {
+    "primary": "#3B82F6",
+    "secondary": "#8B5CF6",
+    "accent": "#10B981",
+    "background": "#FFFFFF",
+    "text": "#1F2937"
+  },
+  "typography": {
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "headingSize": "2.5rem",
+    "bodySize": "1rem"
+  },
+  "tone": "bold and vibrant",
+  "keywords": [
+    "clean",
+    "professional",
+    "accessible",
+    "modern",
+    "minimalist",
+    "energetic",
+    "dynamic"
+  ]
+}

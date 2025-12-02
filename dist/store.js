@@ -4,7 +4,8 @@ import { fileURLToPath } from 'url';
 import { designProfileSchema } from './designProfileSchema.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const DATA_FILE = resolve(__dirname, '../../design-profile.json');
+// When running from dist/, go up one level to project root
+const DATA_FILE = resolve(__dirname, '../design-profile.json');
 export async function loadDesignProfile() {
     try {
         const data = await fs.readFile(DATA_FILE, 'utf8');
